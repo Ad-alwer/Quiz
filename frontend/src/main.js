@@ -8,11 +8,11 @@ import { createRouter, createWebHashHistory } from "vue-router";
 
 import Register from "./components/reg.vue";
 import login from "./components/login.vue";
-import home from "./components/home.vue"
-import create from "./components/create.vue"
-import exam from "./components/exam.vue"
-import notfound from "./components/404.vue"
-import test from "./components/loader.vue"
+import home from "./components/home.vue";
+import create from "./components/create.vue";
+import exam from "./components/exam.vue";
+import notfound from "./components/404.vue";
+import test from "./components/exam/detailshower.vue";
 
 const routes = [
   { path: "/", component: App },
@@ -22,9 +22,7 @@ const routes = [
   { path: "/createexam", component: create },
   { path: "/exam/:id", component: exam },
   { path: "/404", component: notfound },
-  { path: "/test", component: test },
-  
-
+  { path: "/mnb", component: test },
 ];
 
 const router = createRouter({
@@ -60,17 +58,11 @@ library.add(
   faEyeSlash,
   faTimes,
   faTimesCircle,
-  faShare,faCopy
+  faShare,
+  faCopy
 );
 
-
-
-import VueSocialSharing from 'vue-social-sharing'
-
-
-
-
-
+import VueSocialSharing from "vue-social-sharing";
 
 createApp(App)
   .use(bootstrap)

@@ -97,6 +97,28 @@ async function addcreate(userid, quizid) {
     },
     { new: true }
   );
+  return resault;
+}
+
+async function addquiz(jwt, mark, answer, autor,quizid) {
+  let user = await getbyjwt(jwt);
+  let userquizes = user.data.quiz;
+  let newquiz = {
+    quizid,
+    mark,
+    answer,
+    autor,
+  };
+  userquizes.push(newquiz)
+  let resault = await User.findByIdAndUpdate(
+    user.data._id,
+    {
+      $set: {
+       quiz:userquizes,
+      },
+    },
+    { new: true }
+  );
   return resault
 }
 
@@ -105,4 +127,5 @@ module.exports = {
   login,
   getbyjwt,
   addcreate,
+  addquiz
 };

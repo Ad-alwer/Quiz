@@ -53,15 +53,34 @@ app.post("/add", (req, res) => {
 
 // Search exam
 app.get("/search/:id", (req, res) => {
-  
   quizDB.searchquiz(req.params.id).then((data) => res.send(data));
 });
 //
 
 // finish
 app.post("/finish", (req, res) => {
-  quizDB.addparticipant(req.body.quizid,req.body.jwt)
-  
+ console.log( req.body.answers)
+  quizDB
+    .addparticipant(
+      req.body.quizid,
+      req.body.jwt,
+      req.body.mark,
+      req.body.answers,
+      req.body.field
+    )
+    .then(() => {
+      userDB
+        .addquiz(
+          req.body.jwt,
+          req.body.mark,
+          req.body.answers,
+          req.body.autor.username,
+          req.body.quizid
+        )
+        .then(() => {
+          return res.send({ status: "complete" });
+        });
+    });
 });
 //
 

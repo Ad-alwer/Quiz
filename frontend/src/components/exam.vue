@@ -1,10 +1,11 @@
 <template>
-  <div v-if="!loading">
+  <div v-if="!loading && !detail">
     <div class="my-4 py-3 mx-2 rounded-4 border border-info border-2">
       <p class="text-uppercase text-center fw-bold fs-1">{{ name }}</p>
       <div class="d-flex justify-content-center flex-nowrap gap-2">
         <input
           v-for="x in field"
+          :readonly="savedanswer"
           :key="x"
           :placeholder="x.name"
           type="text"
@@ -73,21 +74,29 @@
       </div>
     </div>
     <div class="d-flex justify-content-center">
-      <button class="btn btn-primary fs-5 py-2 px-4" @click="finish">
+      <button class="btn btn-primary fs-5 py-2 px-4 mb-3 " @click="finish">
         Finish
       </button>
     </div>
 
     <div></div>
   </div>
-  <div v-else>
+  <div v-else-if="loading && detail">
     <loader />
   </div>
+  <detail
+    v-else-if="!loading && detail"
+    :percent="mark"
+    :correct="corectcounter"
+    :hmquestion="length"
+    :answer="answer"
+  />
 </template>
 
 <script>
 import axios from "axios";
 import loader from "../components/loader.vue";
+import detail from "../components/exam/examdetail.vue";
 import { info } from "../../config/default";
 import regfunc from "../components/reg.vue";
 import Swal from "sweetalert2";
@@ -164,7 +173,7 @@ export default {
         this.remainingTime--;
       } else {
         clearInterval(this.intervalId);
-        console.log("finish");
+        this.finish();
       }
     }, 1000);
   },
@@ -178,55 +187,62 @@ export default {
       answer: [],
       remainingTime: null,
       intervalId: null,
-      loading: true,
+      loading: false,
       fieldsval: false,
+      detail: false,
+      mark: null,
+      corectcounter: null,
+      length: null,
+      savedanswer: false,
     };
   },
   methods: {
     check: function (question, option, num) {
+      if (!this.savedanswer) {
         this.field.forEach((e) => {
-        const ref = e.name + "inp";
+          const ref = e.name + "inp";
 
-        if (this.$refs[ref][0].value) {
-          e.val = this.$refs[ref][0].value;
-          this.fieldsval = true
-        } else {
-          Toast.fire({
-            icon: "error",
-            title: `Please Fill All Inputs`,
+          if (this.$refs[ref][0].value) {
+            e.val = this.$refs[ref][0].value;
+            this.fieldsval = true;
+          } else {
+            Toast.fire({
+              icon: "error",
+              title: `Please Fill All Inputs`,
+            });
+            return (this.fieldsval = false);
+          }
+        });
+
+        if (this.fieldsval) {
+          let options = [
+            `${question}Option1`,
+            `${question}Option2`,
+            `${question}Option3`,
+            `${question}Option4`,
+          ];
+          let answer = `${question}Option${num}`;
+
+          let item = this.$refs[answer];
+
+          let index = options.findIndex((e) => {
+            return e == answer;
           });
-          return this.fieldsval =false
+          options.splice(index, 1);
+          options.forEach((e) => {
+            this.$refs[e][0].style.backgroundColor = "#fff";
+          });
+          item[0].style.backgroundColor = "#66bb6a";
+
+          let answerindex = this.answer.findIndex((e) => {
+            return e.question == question;
+          });
+          this.readonly = true;
+
+          this.answer[answerindex].personanswer = option;
         }
-    });
-   
-    if(this.fieldsval){
-        let options = [
-        `${question}Option1`,
-        `${question}Option2`,
-        `${question}Option3`,
-        `${question}Option4`,
-      ];
-      let answer = `${question}Option${num}`;
-
-      let item = this.$refs[answer];
-
-      let index = options.findIndex((e) => {
-        return e == answer;
-      });
-      options.splice(index, 1);
-      options.forEach((e) => {
-        this.$refs[e][0].style.backgroundColor = "#fff";
-      });
-      item[0].style.backgroundColor = "#66bb6a";
-
-      let answerindex = this.answer.findIndex((e) => {
-        return e.question == question;
-      });
-
-      this.answer[answerindex].personanswer = option;
-    
-    }
-},
+      }
+    },
     clear: function (question) {
       let options = [
         `${question}Option1`,
@@ -245,32 +261,37 @@ export default {
       console.log(this.answer[answerindex]);
     },
     finish: function () {
-    
-        let mark = this.scrore();
-        let jwt = regfunc.methods.getcookies("jwt");
-        axios
-          .post(`${apiaddress}finish`, {
-            mark,
-            autor: this.autor,
-            jwt,
-            answers: this.answer,
-            quizid: this.examdetail._id,
-            field:this.field
-          })
-          .then((res) => console.log(res));
-     
+      this.savedanswer = true;
+      this.mark = this.scrore();
+      let jwt = regfunc.methods.getcookies("jwt");
+      axios
+        .post(`${apiaddress}finish`, {
+          mark: this.mark,
+          autor: this.autor,
+          jwt,
+          answers: this.answer,
+          quizid: this.examdetail._id,
+          field: this.field,
+        })
+        .then((res) => {
+          if (res.data.status == "complete") {
+            setTimeout(() => {
+              this.detail = true;
+            }, 5000);
+          }
+        });
     },
     scrore: function () {
-      let lenght = this.answer.length;
+      this.length = this.answer.length;
       let counter = 0;
-      let corectcounter = 0;
+      this.corectcounter = 0;
       this.answer.forEach((e) => {
         let personanswer = e.personanswer;
         let corectanswer = e.correct;
 
         let obj = this.examdetail.questions[counter];
         if (e.correct == personanswer) {
-          corectcounter++;
+          this.corectcounter++;
         } else {
           if (personanswer) {
             const foundoptioncorrect = Object.keys(obj).find(
@@ -297,7 +318,8 @@ export default {
 
         counter++;
       });
-      let resualt = (corectcounter / lenght) * 100;
+
+      let resualt = (this.corectcounter / this.length) * 100;
       return resualt;
     },
     checkfield: function () {
@@ -320,6 +342,7 @@ export default {
   },
   components: {
     loader,
+    detail,
   },
 };
 </script>

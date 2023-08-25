@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const timestamp = require("mongoose-timestamp");
 const config = require("../config/default");
-const jwt =require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 
 mongoose.connect(config.info.db.address).then(() => console.log("conect"));
 
@@ -53,16 +53,34 @@ async function searchquiz(quizid) {
   }
 }
 
-async function addparticipant(quizid,userjwt) {
+async function addparticipant(quizid, userjwt, mark, answer, field) {
+  console.log(answer);
   const decode = jwt.verify(userjwt, config.info.jwt_key);
-  
+
   let quiz = await Quiz.findOne({ _id: quizid });
-  let quizez =quiz.participant
-  //TODO
+  let participantquizez = quiz.participant;
+  let newparticipant = {
+    participantid: decode._id,
+    mark,
+    answer,
+    field,
+  };
+
+  participantquizez.push(newparticipant);
+  let resault = await Quiz.findByIdAndUpdate(
+    quizid,
+    {
+      $set: {
+        participant: participantquizez,
+      },
+    },
+    { new: true }
+  );
+  console.log(resault);
 }
 
 module.exports = {
   addquiz,
   searchquiz,
-  addparticipant
+  addparticipant,
 };
