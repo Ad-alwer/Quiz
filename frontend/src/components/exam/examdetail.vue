@@ -1,5 +1,5 @@
 <template>
-  <form id="popup" >
+  <form id="popup" :class="findshow ? 'blur' : ''">
     <div class="popup-inner rounded-4">
       <input
         type="text"
@@ -60,22 +60,29 @@
         </div>
       </div>
       <div class="d-flex justify-content-center gap-3">
-        <img class="img-fluid" @click.prevent="Home" src="../../assets/Imgs/home.png" />
-        <img class="img-fluid" @click.prevent="detail" src="../../assets/Imgs/information.png" />
+        <img
+          class="img-fluid"
+          @click="home"
+          src="../../assets/Imgs/home.png"
+        />
+        <img class="img-fluid" src="../../assets/Imgs/information.png" @click="detailshower = true" />
       </div>
     </div>
   </form>
-  <detailshower :answer="answer" :mark="percent" />
+  <detailshower
+    v-if="detailshower"
+    :answer="answer"
+    :mark="percent"
+    @closepopup="detailshower = false"
+  />
 </template>
 
 <script>
-import detailshower from "./detailshower.vue"
+import detailshower from "./detailshower.vue";
 export default {
-
-  
   name: "detail",
   components: {
-    detailshower
+    detailshower,
   },
   computed: {
     circle() {
@@ -84,20 +91,19 @@ export default {
   },
   data() {
     return {
-      // percent: null,
-      // correct: null,
-      // hmquestion: null,
+      detailshower: false,
     };
   },
-  props:['percent','correct','hmquestion','answer'],
-  methods:{
-    home:function(){
-      location.href='#/home'
+  props: ["percent", "correct", "hmquestion", "answer"],
+  methods: {
+    home: function () {
+      location.href = "#/home";
     },
-    detail:function(){
-      console.log(this.answer)
-    }
-  }
+
+    closedetailshower: function () {
+      this.detailshower = false;
+    },
+  },
 };
 </script>
 
@@ -177,5 +183,8 @@ img {
 }
 input[type="text"] {
   cursor: pointer;
+}
+.blur {
+  filter: blur(3px);
 }
 </style>

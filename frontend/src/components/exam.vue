@@ -19,7 +19,7 @@
     </div>
     <div>
       <div
-        v-for="x in questions"
+        v-for="(x, i) in questions"
         :key="x"
         class="mt-3 border border-2 border-info my-4 py-3 mx-2 rounded-4"
       >
@@ -32,8 +32,8 @@
             class="form-control border border-1 border-black text-center"
             readonly
             :value="x.Option1"
-            @click.prevent="check(x.Question, x.Option1, 1)"
-            :ref="x.Question + 'Option1'"
+            @click.prevent="check(i, x.Option1, 1, x.Question)"
+            :ref="i + 'Option1'"
           />
           <input
             type="text"
@@ -42,8 +42,8 @@
             class="form-control border border-1 border-black text-center"
             readonly
             :value="x.Option2"
-            @click.prevent="check(x.Question, x.Option2, 2)"
-            :ref="x.Question + 'Option2'"
+            @click.prevent="check(i, x.Option2, 2, x.Question)"
+            :ref="i + 'Option2'"
           />
         </div>
         <div class="d-flex justify-content-around mt-3">
@@ -54,8 +54,8 @@
             class="form-control border border-1 border-black text-center"
             readonly
             :value="x.Option3"
-            @click.prevent="check(x.Question, x.Option3, 3)"
-            :ref="x.Question + 'Option3'"
+            @click.prevent="check(i, x.Option3, 3, x.Question)"
+            :ref="i + 'Option3'"
           />
           <input
             type="text"
@@ -64,24 +64,24 @@
             class="form-control border border-1 border-black text-center"
             readonly
             :value="x.Option4"
-            @click.prevent="check(x.Question, x.Option4, 4)"
-            :ref="x.Question + 'Option4'"
+            @click.prevent="check(i, x.Option4, 4, x.Question)"
+            :ref="i + 'Option4'"
           />
         </div>
         <div class="d-flex justify-content-center align-items-center">
-          <img src="../assets/Imgs/clear.png" @click="clear(x.Question)" />
+          <img src="../assets/Imgs/clear.png" @click="clear(x.Question, i)" />
         </div>
       </div>
     </div>
     <div class="d-flex justify-content-center">
-      <button class="btn btn-primary fs-5 py-2 px-4 mb-3 " @click="finish">
+      <button class="btn btn-primary fs-5 py-2 px-4 mb-3" @click="finish">
         Finish
       </button>
     </div>
 
     <div></div>
   </div>
-  <div v-else-if="loading && detail">
+  <div v-else-if="loading">
     <loader />
   </div>
   <detail
@@ -119,38 +119,78 @@ export default {
   beforeMount() {
     let locationhash = location.hash;
     let loc = locationhash.split("m/")[1];
-    this.h1 = loc;
-    axios.get(`${apiaddress}search/${loc}`).then((data) => {
-      if (data.data.status) {
-        if (data.data.data.status == "open") {
-          data.data.data.field.forEach((e) => {
-            let newfield = {
-              name: e,
-              val: null,
-            };
-            this.field.push(newfield);
-          });
+    // this.h1 = loc;
+    let jwt = regfunc.methods.getcookies("jwt");
 
-          this.examdetail = data.data.data;
-          this.name = data.data.data.name;
-          this.autor = data.data.data.autor;
-          this.questions = data.data.data.questions;
-          this.remainingTime = data.data.data.time * 60;
-          this.questions.forEach((e) => {
-            let newanswer = {
-              question: e.Question,
-              correct: e.answer,
-              personanswer: null,
-            };
-            this.answer.push(newanswer);
-          });
+    if (jwt) {
+      axios.get(`${apiaddress}jwt/${jwt}`).then((res) => {
+        if (res.data.status == "ok") {
+          axios
+            .post(`${apiaddress}check`, {
+              jwt,
+              loc,
+            })
+            .then((res) => {
+              if (res.data.status == "participant") {
+                this.loading=false
+                this.detail=true
+                this.mark = res.data.data.mark;
+                this.answer = res.data.data.answer;
+                this.length = this.answer.length;
+                this.corectcounter=0
+                this.answer.forEach((e) => {
+                  if (e.correct == e.personanswer) {
+                    this.corectcounter++;
+                  }
+                });
+              } else if(res.data.status == "creator"){
+                //TODO WRITE AFTER WRITE PROFILE
+
+              }else if(!res.data.status){
+     axios.get(`${apiaddress}search/${loc}`).then((data) => {
+                if (data.data.status) {
+                  if (data.data.data.status == "open") {
+                    data.data.data.field.forEach((e) => {
+                      let newfield = {
+                        name: e,
+                        val: null,
+                      };
+                      this.field.push(newfield);
+                    });
+
+                    this.examdetail = data.data.data;
+                    this.name = data.data.data.name;
+                    this.autor = data.data.data.autor;
+                    this.questions = data.data.data.questions;
+                    this.remainingTime = data.data.data.time * 60;
+                    this.questions.forEach((e) => {
+                      let newanswer = {
+                        question: e.Question,
+                        correct: e.answer,
+                        personanswer: null,
+                      };
+                      this.answer.push(newanswer);
+                    });
+                    this.loading = false;
+                    this.timer=true
+                  } else {
+                    location.href = "#/404";
+                  }
+                } else {
+                  location.href = "#/404";
+                }
+              });
+              }
+         
+            });
         } else {
-          location.href = "#/404";
+          regfunc.methods.removecookies(7, jwt);
+          location.href = "#/login";
         }
-      } else {
-        location.href = "#/404";
-      }
-    });
+      });
+    } else {
+      location.href = "#/login";
+    }
   },
   computed: {
     minutes() {
@@ -163,19 +203,14 @@ export default {
     },
   },
   mounted() {
-    document.onreadystatechange = () => {
-      if (document.readyState == "complete") {
-        this.loading = false;
-      }
-    };
-    this.intervalId = setInterval(() => {
-      if (this.remainingTime > 0) {
-        this.remainingTime--;
-      } else {
-        clearInterval(this.intervalId);
-        this.finish();
-      }
-    }, 1000);
+    
+   if(this.timer){
+// document.onreadystatechange = () => {
+    //   if (document.readyState == "complete") {
+    //     this.loading = false;
+    //   }
+    // };
+   }
   },
   data() {
     return {
@@ -189,15 +224,17 @@ export default {
       intervalId: null,
       loading: false,
       fieldsval: false,
-      detail: false,
+      detail: true,
       mark: null,
       corectcounter: null,
       length: null,
       savedanswer: false,
+      test: null,
+      timer:false
     };
   },
   methods: {
-    check: function (question, option, num) {
+    check: function (i, option, num, question) {
       if (!this.savedanswer) {
         this.field.forEach((e) => {
           const ref = e.name + "inp";
@@ -216,12 +253,12 @@ export default {
 
         if (this.fieldsval) {
           let options = [
-            `${question}Option1`,
-            `${question}Option2`,
-            `${question}Option3`,
-            `${question}Option4`,
+            `${i}Option1`,
+            `${i}Option2`,
+            `${i}Option3`,
+            `${i}Option4`,
           ];
-          let answer = `${question}Option${num}`;
+          let answer = `${i}Option${num}`;
 
           let item = this.$refs[answer];
 
@@ -233,6 +270,7 @@ export default {
             this.$refs[e][0].style.backgroundColor = "#fff";
           });
           item[0].style.backgroundColor = "#66bb6a";
+          console.log(answer);
 
           let answerindex = this.answer.findIndex((e) => {
             return e.question == question;
@@ -243,12 +281,12 @@ export default {
         }
       }
     },
-    clear: function (question) {
+    clear: function (question, i) {
       let options = [
-        `${question}Option1`,
-        `${question}Option2`,
-        `${question}Option3`,
-        `${question}Option4`,
+        `${i}Option1`,
+        `${i}Option2`,
+        `${i}Option3`,
+        `${i}Option4`,
       ];
       options.forEach((e) => {
         this.$refs[e][0].style.backgroundColor = "#fff";
@@ -258,28 +296,30 @@ export default {
       });
 
       this.answer[answerindex].personanswer = null;
-      console.log(this.answer[answerindex]);
     },
     finish: function () {
       this.savedanswer = true;
       this.mark = this.scrore();
       let jwt = regfunc.methods.getcookies("jwt");
-      axios
-        .post(`${apiaddress}finish`, {
-          mark: this.mark,
-          autor: this.autor,
-          jwt,
-          answers: this.answer,
-          quizid: this.examdetail._id,
-          field: this.field,
-        })
-        .then((res) => {
-          if (res.data.status == "complete") {
-            setTimeout(() => {
-              this.detail = true;
-            }, 5000);
-          }
-        });
+
+      if (jwt) {
+        axios
+          .post(`${apiaddress}finish`, {
+            mark: this.mark,
+            autor: this.autor,
+            jwt,
+            answers: this.answer,
+            quizid: this.examdetail._id,
+            field: this.field,
+          })
+          .then((res) => {
+            if (res.data.status == "complete") {
+              setTimeout(() => {
+                this.detail = true;
+              }, 5000);
+            }
+          });
+      }
     },
     scrore: function () {
       this.length = this.answer.length;
@@ -290,6 +330,8 @@ export default {
         let corectanswer = e.correct;
 
         let obj = this.examdetail.questions[counter];
+        console.log(obj);
+
         if (e.correct == personanswer) {
           this.corectcounter++;
         } else {
@@ -297,21 +339,21 @@ export default {
             const foundoptioncorrect = Object.keys(obj).find(
               (key) => obj[key] === corectanswer
             );
-            let correcttbtn = obj["Question"] + foundoptioncorrect;
+
+            let correcttbtn = counter + foundoptioncorrect;
+
             this.$refs[correcttbtn][0].style.backgroundColor = "#4b8c4d";
 
             const foundoptionfalse = Object.keys(obj).find(
               (key) => obj[key] === personanswer
             );
-            let Falsetbtn = obj["Question"] + foundoptionfalse;
+            let Falsetbtn = counter + foundoptionfalse;
             this.$refs[Falsetbtn][0].style.backgroundColor = "#fc2100";
-            //   console.log(obj['Question'])
-            //   console.log(foundoptionfalse);
           } else {
             const foundoptioncorrect = Object.keys(obj).find(
               (key) => obj[key] === corectanswer
             );
-            let correcttbtn = obj["Question"] + foundoptioncorrect;
+            let correcttbtn = counter + foundoptioncorrect;
             this.$refs[correcttbtn][0].style.backgroundColor = "#4b8c4d";
           }
         }
@@ -319,7 +361,7 @@ export default {
         counter++;
       });
 
-      let resualt = (this.corectcounter / this.length) * 100;
+      let resualt = Math.ceil((this.corectcounter / this.length) * 100);
       return resualt;
     },
     checkfield: function () {
@@ -328,7 +370,6 @@ export default {
 
         if (this.$refs[ref][0].value) {
           e.val = this.$refs[ref][0].value;
-          console.log(e);
         } else {
           Toast.fire({
             icon: "error",

@@ -12,25 +12,21 @@ export default {
     if (regfunc.methods.getcookies("jwt")) {
       let jwt = regfunc.methods.getcookies("jwt");
       let apiaddress = info.fetch["address"];
-
-      axios
-        .post(`${apiaddress}jwt`, {
-          jwt,
-        })
-        .then((res) => {
-          if (res.data.status) {
-            if (
-              location.href == `${info.server}#/home` ||
-              location.href == `${info.server}` ||
-              location.href == `${info.server}#/`
-            ) {
-              return (location.href = `${info.server}#/home`);
-            }
-          } else {
-            regfunc.methods.removecookies(7, jwt);
-            location.href = "#/login";
+      console.log(jwt);
+      axios.get(`${apiaddress}jwt/${jwt}`).then((res) => {
+        if (res.data.status == "ok") {
+          if (
+            location.href == `${info.server}#/home` ||
+            location.href == `${info.server}` ||
+            location.href == `${info.server}#/`
+          ) {
+            return (location.href = `${info.server}#/home`);
           }
-        });
+        } else {
+          regfunc.methods.removecookies(7, jwt);
+          location.href = "#/login";
+        }
+      });
     } else {
       location.href = "#/login";
     }
@@ -39,13 +35,12 @@ export default {
 };
 </script>
 
-<style >
-:root{
-  --blue:#4072E8;
-  --header-blue-light:#B3C7F6;
-  --header-blue-dark:#8CAAF1;
-  --dark-blue:#170e9e;
-  
+<style>
+:root {
+  --blue: #4072e8;
+  --header-blue-light: #b3c7f6;
+  --header-blue-dark: #8caaf1;
+  --dark-blue: #170e9e;
 }
 * {
   font-family: "Roboto";
@@ -62,7 +57,6 @@ export default {
 }
 @font-face {
   font-family: "Digital";
-  src: local("Digital"),
-    url(./assets/fonts/DS-DIGI.TTF) format("truetype");
+  src: local("Digital"), url(./assets/fonts/DS-DIGI.TTF) format("truetype");
 }
 </style>

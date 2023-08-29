@@ -4,36 +4,41 @@ vue
     <div class="popup-inner rounded-4">
       <div>
         <font-awesome-icon
-        icon="fa-solid fa-times"
-        class="text-danger fs-5 iconclose"
-        id="nameawesome"
-       
-      />
+          icon="fa-solid fa-times"
+          class="text-danger fs-5 iconclose"
+          id="nameawesome"
+          @click="close"
+        />
         <p class="text-center fw-bold fs-4">Detail</p>
       </div>
       <div>
         <table class="table">
           <thead>
-            <tr>
+            <tr class="pb-3">
               <th class="text-capitalize" scope="col">question</th>
-              <th class="text-capitalize ps-3 "  scope="col">your answer</th>
-              <th class="text-capitalize ps-3 "  scope="col">Correctanswer</th>
+              <th class="text-capitalize ps-3" scope="col">your answer</th>
+              <th class="text-capitalize ps-3 " scope="col">Correctanswer</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="x in answer" :key="x">
-              <th class="text-capitalize ">{{ x.question }}</th>
-              <th class="text-capitalize ps-4">{{ x.personanswer }}</th>
-              <th class="text-capitalize ps-4">{{ x.correct }}</th>
+            <tr
+              v-for="x in answer"
+              :key="x"
+              :class="x.correct == x.personanswer ? 'table-success  ' : 'table-danger    '"
               
+            >
+              <th class="text-capitalize py--2">
+                {{ x.question }}
+              </th>
+              <th class="text-capitalize ps-4 py--2">{{ x.personanswer }}</th>
+              <th class="text-capitalize ps-4 py--2">{{ x.correct }}</th>
             </tr>
-            
           </tbody>
           <tfoot class="table-dark">
-        <tr>
-          <td class="text-center" colspan="3">{{mark}}%</td>
-        </tr>
-      </tfoot>
+            <tr>
+              <td class="text-center" colspan="3">{{ mark }} / 100</td>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>
@@ -43,10 +48,21 @@ vue
 <script>
 export default {
   name: "detailshower",
-  props:['answer','mark'],
-  mounted(){
-    console.log(this.answer)
-  }
+  props: ["answer", "mark"],
+  mounted() {
+    document.addEventListener("keydown", this.esc);
+  },
+  methods: {
+    close: function () {
+      this.$emit("closepopup", "closed");
+      
+    },
+  },
+  esc: function (e) {
+    if (e.key === "Escape") {
+      this.close();
+    }
+  },
 };
 </script>
 
@@ -72,11 +88,10 @@ export default {
     max-height: 720px;
   }
 }
-.iconclose{
-    position: absolute;
-    right: 20px;
-    top:10px;
-    cursor: pointer;
+.iconclose {
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  cursor: pointer;
 }
 </style>
-  

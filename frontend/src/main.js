@@ -12,7 +12,9 @@ import home from "./components/home.vue";
 import create from "./components/create.vue";
 import exam from "./components/exam.vue";
 import notfound from "./components/404.vue";
-import test from "./components/exam/detailshower.vue";
+
+import profile from "./components/profile.vue";
+import test from "./components/Profile/popupchange.vue";
 
 const routes = [
   { path: "/", component: App },
@@ -22,6 +24,8 @@ const routes = [
   { path: "/createexam", component: create },
   { path: "/exam/:id", component: exam },
   { path: "/404", component: notfound },
+  { path: "/profile", component: profile },
+
   { path: "/mnb", component: test },
 ];
 
@@ -42,6 +46,7 @@ import {
 import {
   faCheckCircle,
   faCopy,
+  faEdit,
   faEye,
   faEyeSlash,
   faShare,
@@ -59,7 +64,8 @@ library.add(
   faTimes,
   faTimesCircle,
   faShare,
-  faCopy
+  faCopy,
+  faEdit
 );
 
 import VueSocialSharing from "vue-social-sharing";
