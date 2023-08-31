@@ -5,7 +5,7 @@
         <input
           type="text"
           class="form-control border-black border-1 px-2 py-2 d-inline"
-          disabled
+          readonly
           :value="url"
         />
         <font-awesome-icon
@@ -135,7 +135,7 @@ export default {
   }
 }
 input {
-  width: 450px;
+  width: 510px;
   box-shadow: 0px 8px 36px -7px rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: 0px 8px 36px -7px rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0px 8px 36px -7px rgba(0, 0, 0, 0.5);

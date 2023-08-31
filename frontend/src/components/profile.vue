@@ -7,8 +7,8 @@
     "
   >
     <pheader />
-    <div class="ms-5">
-      <nav class="d-flex mt-5">
+    <div class=" justify-content-center d-flex my-3 ">
+      <nav class="d-flex   w-50 justify-content-center rounded-4  user ">
         <img
           src="../assets/Imgs/img.png"
           class="img-thumbnail rounded-4"
@@ -27,9 +27,14 @@
           />
         </div>
       </nav>
-      <div></div>
-      <div></div>
-    </div>
+      
+    </div >
+   <div class="d-flex justify-content-center my-3 ">
+    <shower type="quiz" class="w-50"/>
+   </div>
+   <div class="d-flex justify-content-center my-3  ">
+    <shower type="create" class="w-50"/>
+   </div>
   </div>
   <pedit
     v-if="edit"
@@ -44,6 +49,7 @@
 import axios from "axios";
 import pheader from "../components/Profile/header.vue";
 import pedit from "../components/Profile/popupchange.vue";
+import shower from "../components/Profile/lastshower.vue"
 import { info } from "../../config/default";
 import regfunc from "../components/reg.vue";
 // import Swal from "sweetalert2";
@@ -54,7 +60,7 @@ export default {
   name: "Profile",
   beforeMount() {
     if (jwt) {
-     this.getuser()
+      this.getuser();
     } else {
       location.href = "#/login";
     }
@@ -62,15 +68,16 @@ export default {
   components: {
     pheader,
     pedit,
+    shower
   },
   data() {
     return {
       edit: false,
-      user: null,
-    }
+      user: [],
+    };
   },
   methods: {
-    getuser:function(){
+    getuser: function () {
       axios.get(`${apiaddress}jwt/${jwt}`).then((res) => {
         if (res.data.status == "ok") {
           this.user = res.data.data;
@@ -79,10 +86,10 @@ export default {
         }
       });
     },
-    closepopup:function(){
-      this.edit = false
-      this.getuser()
-    }
+    closepopup: function () {
+      this.edit = false;
+      this.getuser();
+    },
   },
 };
 </script>
@@ -93,5 +100,14 @@ img {
 }
 .blur {
   filter: blur(3px);
+}
+.user{
+  border: 2px #C5C2E7 solid;
+  padding: 10px;
+    box-shadow: -3px 26px 30px -32px rgba(0,0,0,1);
+  -webkit-box-shadow: -3px 26px 30px -32px rgba(0,0,0,1);
+  -moz-box-shadow: -3px 26px 30px -32px rgba(0,0,0,1);
+ 
+
 }
 </style>

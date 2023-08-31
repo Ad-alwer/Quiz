@@ -90,6 +90,7 @@
     :correct="corectcounter"
     :hmquestion="length"
     :answer="answer"
+    :name="name"
   />
 </template>
 
@@ -131,57 +132,60 @@ export default {
               loc,
             })
             .then((res) => {
+              console.log(res)
               if (res.data.status == "participant") {
-                this.loading=false
-                this.detail=true
+              
+                this.loading = false;
+                this.detail = true;
                 this.mark = res.data.data.mark;
                 this.answer = res.data.data.answer;
                 this.length = this.answer.length;
-                this.corectcounter=0
+                this.corectcounter = 0;
                 this.answer.forEach((e) => {
                   if (e.correct == e.personanswer) {
                     this.corectcounter++;
                   }
                 });
-              } else if(res.data.status == "creator"){
-                //TODO WRITE AFTER WRITE PROFILE
+              } else if (res.data.status == "creator") {
+                
+                this.loading=true
+                location.href=`#/report/${loc}`
+              } else if (!res.data.status) {
+                axios.get(`${apiaddress}search/${loc}`).then((data) => {
+                  if (data.data.status) {
+                    if (data.data.data.status == "open") {
+                      data.data.data.field.forEach((e) => {
+                        let newfield = {
+                          name: e,
+                          val: null,
+                        };
+                        this.field.push(newfield);
+                      });
 
-              }else if(!res.data.status){
-     axios.get(`${apiaddress}search/${loc}`).then((data) => {
-                if (data.data.status) {
-                  if (data.data.data.status == "open") {
-                    data.data.data.field.forEach((e) => {
-                      let newfield = {
-                        name: e,
-                        val: null,
-                      };
-                      this.field.push(newfield);
-                    });
-
-                    this.examdetail = data.data.data;
-                    this.name = data.data.data.name;
-                    this.autor = data.data.data.autor;
-                    this.questions = data.data.data.questions;
-                    this.remainingTime = data.data.data.time * 60;
-                    this.questions.forEach((e) => {
-                      let newanswer = {
-                        question: e.Question,
-                        correct: e.answer,
-                        personanswer: null,
-                      };
-                      this.answer.push(newanswer);
-                    });
-                    this.loading = false;
-                    this.timer=true
+                      this.examdetail = data.data.data;
+                      this.name = data.data.data.name;
+                      this.autor = data.data.data.autor;
+                      this.questions = data.data.data.questions;
+                      this.remainingTime = data.data.data.time * 60;
+                      this.questions.forEach((e) => {
+                        let newanswer = {
+                          question: e.Question,
+                          correct: e.answer,
+                          personanswer: null,
+                        };
+                        this.answer.push(newanswer);
+                      });
+                      this.loading = false;
+                      this.detail = false;
+                      this.timer = true;
+                    } else {
+                      location.href = "#/404";
+                    }
                   } else {
                     location.href = "#/404";
                   }
-                } else {
-                  location.href = "#/404";
-                }
-              });
+                });
               }
-         
             });
         } else {
           regfunc.methods.removecookies(7, jwt);
@@ -203,26 +207,33 @@ export default {
     },
   },
   mounted() {
-    
-   if(this.timer){
-// document.onreadystatechange = () => {
+    // document.onreadystatechange = () => {
     //   if (document.readyState == "complete") {
     //     this.loading = false;
     //   }
     // };
-   }
+    this.intervalId = setInterval(() => {
+      if (this.remainingTime > 0) {
+        this.remainingTime--;
+      } else {
+        clearInterval(this.intervalId);
+    if(this.timer){
+      this.finish()
+    }
+      }
+    }, 1000);
   },
   data() {
     return {
       examdetail: [],
       field: [],
-      name: [],
+      name: null,
       autor: null,
       questions: [],
       answer: [],
       remainingTime: null,
       intervalId: null,
-      loading: false,
+      loading: true,
       fieldsval: false,
       detail: true,
       mark: null,
@@ -230,7 +241,7 @@ export default {
       length: null,
       savedanswer: false,
       test: null,
-      timer:false
+      timer: false,
     };
   },
   methods: {
@@ -310,6 +321,7 @@ export default {
             jwt,
             answers: this.answer,
             quizid: this.examdetail._id,
+            quizname: this.name,
             field: this.field,
           })
           .then((res) => {
@@ -405,7 +417,7 @@ img {
   cursor: pointer;
 }
 #timer {
-  position: fixed;
+  position: absolute;
   top: 10%;
   right: 3%;
 }

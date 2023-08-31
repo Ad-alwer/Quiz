@@ -5,7 +5,7 @@
         type="text"
         class="form-control text-center px-3"
         readonly
-        value="Name"
+        :value="name"
       />
       <div>
         <div class="d-flex gap-5">
@@ -94,7 +94,7 @@ export default {
       detailshower: false,
     };
   },
-  props: ["percent", "correct", "hmquestion", "answer"],
+  props: ["percent", "correct", "hmquestion", "answer",'name'],
   methods: {
     home: function () {
       location.href = "#/home";

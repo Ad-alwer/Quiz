@@ -12,9 +12,10 @@ import home from "./components/home.vue";
 import create from "./components/create.vue";
 import exam from "./components/exam.vue";
 import notfound from "./components/404.vue";
-
+import pshow from "./components/Profile/shower"
 import profile from "./components/profile.vue";
 import test from "./components/Profile/popupchange.vue";
+import report from "./components/Profile/showresault.vue"
 
 const routes = [
   { path: "/", component: App },
@@ -25,6 +26,12 @@ const routes = [
   { path: "/exam/:id", component: exam },
   { path: "/404", component: notfound },
   { path: "/profile", component: profile },
+  { path: "/profile/exams", component:pshow },
+  { path: "/profile/created", component:pshow },
+  { path: "/report/:id", component:report },
+
+
+
 
   { path: "/mnb", component: test },
 ];

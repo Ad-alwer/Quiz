@@ -30,25 +30,7 @@
         placeholder="Time (Min)"
       />
     </div>
-    <div class="mt-4">
-      <p class="text-secondary fs-5 fw-bold">Field</p>
-      <div class="d-flex gap-3 text-center">
-        <button
-          class="btn border border-2 py-2 ms-4 px-3 fieldbtn btngreen fs-5 text-capitalize"
-          @click.prevent="addfield"
-        >
-          +
-        </button>
-        <button
-          v-for="x in field"
-          :key="x"
-          @click.prevent="deletefield(x)"
-          class="btn border border-2 py-2 px-3 fieldbtn fs-5 text-capitalize"
-        >
-          {{ x }}
-        </button>
-      </div>
-    </div>
+   
     <div class="mt-4">
       <p class="text-secondary fs-5 fw-bold">Questions</p>
       <button
@@ -197,7 +179,7 @@ export default {
               let quizid = res.data.data._id;
               this.examcreater=res.data.data.autor.username
               this.examname=res.data.data.name
-              this.url = `${info.server}${quizid}`;
+              this.url = `${info.server}/#/exam/${quizid}`;
               this.shareshow = true;
             }
             else{
