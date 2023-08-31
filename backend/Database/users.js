@@ -2,13 +2,13 @@ const mongoose = require("mongoose");
 const timestamp = require("mongoose-timestamp");
 const config = require("../config/default");
 const jwt = require("jsonwebtoken");
+// const quizDB = require("./Quiz");
 mongoose.connect(config.info.db.address).then(() => console.log("conect"));
 
 const quizschema = new mongoose.Schema({
   username: { type: String, required: true, uniqe: true, lowercase: true },
   email: { type: String, required: true, uniqe: true, lowercase: true },
   password: { type: String, required: true },
-  profile: { type: mongoose.Schema.Types.ObjectId, default: null },
   quiz: [],
   create: [],
 });
@@ -78,16 +78,23 @@ async function login(name, password) {
 
 async function getbyjwt(userjwt) {
   const decode = jwt.verify(userjwt, config.info.jwt_key);
+
   let user = await User.findOne({ _id: decode });
-  return {
-    status: "ok",
-    data: user,
-  };
+  if (user) {
+    return {
+      status: "ok",
+      data: user,
+    };
+  } else {
+    return {
+      status: false,
+    };
+  }
 }
-async function addcreate(userid, quizid) {
+async function addcreate(userid, quizid, quizname) {
   let user = await User.findOne({ _id: userid });
   let usercreate = user.create;
-  usercreate.push(quizid);
+  usercreate.push({ id: quizid, name: quizname });
   let resault = await User.findByIdAndUpdate(
     userid,
     {
@@ -100,26 +107,148 @@ async function addcreate(userid, quizid) {
   return resault;
 }
 
-async function addquiz(jwt, mark, answer, autor,quizid) {
+async function addquiz(jwt, mark, answer, autor, quizid, quizname) {
   let user = await getbyjwt(jwt);
+
   let userquizes = user.data.quiz;
+
   let newquiz = {
-    quizid,
+    quizdetail: { name: quizname, id: quizid },
     mark,
     answer,
     autor,
   };
-  userquizes.push(newquiz)
+  userquizes.push(newquiz);
   let resault = await User.findByIdAndUpdate(
     user.data._id,
     {
       $set: {
-       quiz:userquizes,
+        quiz: userquizes,
       },
     },
     { new: true }
   );
-  return resault
+  return resault;
+}
+
+async function checkuser(jwt, quizdetail) {
+  let user = await getbyjwt(jwt);
+
+  const resault = user.data.create.find((e) => {
+    return e.id == quizdetail;
+  });
+
+  if (resault) {
+    return {
+      status: "creator",
+      data: resault,
+    };
+  } else {
+    const checkjoin = user.data.quiz.find((e) => {
+      return e.quizdetail.id == quizdetail;
+    });
+
+    if (checkjoin) {
+      return {
+        status: "participant",
+        data: checkjoin,
+      };
+    } else {
+      return {
+        status: false,
+        data: checkjoin,
+      };
+    }
+  }
+}
+async function usernameexist(name) {
+  let user = await User.findOne({ username: name });
+  if (user) {
+    return true;
+  } else {
+    return false;
+  }
+}
+async function emailexist(mail) {
+  let user = await User.findOne({ email: mail });
+
+  if (user) {
+    return true;
+  } else {
+    return false;
+  }
+}
+async function changeusername(userjwt, newusername) {
+  const user = await getbyjwt(userjwt);
+
+  let resault = await User.findByIdAndUpdate(
+    user.data._id,
+    {
+      $set: {
+        username: newusername,
+      },
+    },
+    { new: true }
+  );
+  return {
+    status: "ok",
+    data: resault,
+  };
+}
+async function changeemail(userjwt, newemail) {
+  const user = await getbyjwt(userjwt);
+
+  let resault = await User.findByIdAndUpdate(
+    user.data._id,
+    {
+      $set: {
+        email: newemail,
+      },
+    },
+    { new: true }
+  );
+  return {
+    status: "ok",
+    data: resault,
+  };
+}
+async function changepassword(userjwt, newepassword) {
+  const user = await getbyjwt(userjwt);
+
+  let resault = await User.findByIdAndUpdate(
+    user.data._id,
+    {
+      $set: {
+        password: newepassword,
+      },
+    },
+    { new: true }
+  );
+  return {
+    status: "ok",
+    data: resault,
+  };
+}
+async function lastshow(userjwt) {
+  const user = await getbyjwt(userjwt);
+
+  const resault = user.data.quiz.slice(0, 5);
+
+  return resault;
+}
+async function getallexam(userjwt) {
+  const user = await getbyjwt(userjwt);
+  return user.data.quiz;
+}
+async function checkpartisipaint(jwt, quizid) {
+  console.log(quizid);
+  let user = await getbyjwt(jwt);
+
+  let resault = user.data.create.find((e) => {
+    return e.id == quizid;
+  });
+  console.log(resault);
+  return resault;
 }
 
 module.exports = {
@@ -127,5 +256,15 @@ module.exports = {
   login,
   getbyjwt,
   addcreate,
-  addquiz
+  addquiz,
+  checkuser,
+  usernameexist,
+  emailexist,
+  changeusername,
+  changeemail,
+  changepassword,
+  lastshow,
+  getallexam,
+  checkpartisipaint,
+  checkpartisipaint,
 };
