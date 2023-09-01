@@ -273,7 +273,7 @@ export default {
     background-color: white;
     color: black;
     position: relative;
-    padding: 28px;
+    padding: 20px;
     max-height: 720px;
   }
 }
@@ -283,19 +283,19 @@ export default {
 }
 input[type="text"],
 input[type="password"] {
-  width: 315px;
+  width: 215px;
 }
 #editawesome {
   position: absolute;
-  right: 6%;
-  top: 33%;
+  right: 7%;
+  top: 32%;
   scale: 0.9;
   cursor: pointer;
 }
 
 .regexawesome {
   position: absolute;
-  right: 6%;
-  top: 33%;
+  right: 7%;
+  top: 32%;
 }
 </style>

@@ -144,8 +144,9 @@ async function checkuser(jwt, quizdetail) {
       data: resault,
     };
   } else {
+  
     const checkjoin = user.data.quiz.find((e) => {
-      return e.quizdetail.id == quizdetail;
+      return e.quizid == quizdetail;
     });
 
     if (checkjoin) {

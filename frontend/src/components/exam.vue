@@ -10,7 +10,7 @@
           :placeholder="x.name"
           type="text"
           :ref="x.name + 'inp'"
-          class="form-control text-capitalize ms-1 border-1 border-black inputfield"
+          class="form-control text-capitalize ms-1 border-1 border-black inputfield w-50 text-center mx-2"
         />
       </div>
       <div id="timer" class="text-danger fs-2">
@@ -24,12 +24,12 @@
         class="mt-3 border border-2 border-info my-4 py-3 mx-2 rounded-4"
       >
         <p class="fs-5 fw-bold text-center">{{ x.Question }}</p>
-        <div class="d-flex justify-content-around mt-3 disabled">
+        <div class="d-flex justify-content-around mt-3  mx-3 gap-5">
           <input
             type="text"
             name=""
             id=""
-            class="form-control border border-1 border-black text-center"
+            class="form-control border border-1 border-black text-center w-75"
             readonly
             :value="x.Option1"
             @click.prevent="check(i, x.Option1, 1, x.Question)"
@@ -39,19 +39,19 @@
             type="text"
             name=""
             id=""
-            class="form-control border border-1 border-black text-center"
+            class="form-control border border-1 border-black text-center w-75"
             readonly
             :value="x.Option2"
             @click.prevent="check(i, x.Option2, 2, x.Question)"
             :ref="i + 'Option2'"
           />
         </div>
-        <div class="d-flex justify-content-around mt-3">
+        <div class="d-flex justify-content-around mt-3 mx-3 gap-5">
           <input
             type="text"
             name=""
             id=""
-            class="form-control border border-1 border-black text-center"
+            class="form-control border border-1 border-black text-center w-75"
             readonly
             :value="x.Option3"
             @click.prevent="check(i, x.Option3, 3, x.Question)"
@@ -61,7 +61,7 @@
             type="text"
             name=""
             id=""
-            class="form-control border border-1 border-black text-center"
+            class="form-control border border-1 border-black text-center w-75"
             readonly
             :value="x.Option4"
             @click.prevent="check(i, x.Option4, 4, x.Question)"
@@ -401,11 +401,9 @@ export default {
 </script>
 
 <style scoped>
-.inputfield {
-  width: 350px;
-}
+
 input {
-  width: 450px;
+  
   cursor: pointer;
 }
 .form-control:focus {
@@ -418,8 +416,8 @@ img {
 }
 #timer {
   position: absolute;
-  top: 10%;
-  right: 3%;
+  top: 8%;
+  right: 5%;
 }
 #timer p {
   font-family: "Digital";

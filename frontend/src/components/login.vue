@@ -2,9 +2,7 @@
   <div class="container ms-lg-4">
     <div id="text-reg">
       <div>
-        <p class="fs-1 fw-bold mt-4 mb-4 text-center text-capitalize">
-          Login
-        </p>
+        <p class="fs-1 fw-bold mt-4 mb-4 text-center text-capitalize">Login</p>
       </div>
 
       <div class="ms-2">
@@ -22,10 +20,7 @@
                 @keyup="usernamechecker"
               />
               <font-awesome-icon :class="userawesome" :icon="usernameicn" />
-             
             </div>
-
-          
 
             <div class="mb-4 ps-4 mt-4">
               <label for="password-reg" class="pb-3 text-secondary"
@@ -51,11 +46,11 @@
         </form>
       </div>
 
-      <div>
+      <div class="d-flex justify-content-center flex-nowrap ">
         <button
           type="submit "
           id="btn-login"
-          class="text-uppercase btn btn-danger fs-4 mt-4 px-5 py-3 ms-5 rounded-4"
+          class="text-uppercase btn btn-danger fs-4 mt-4 px-5 py-3 rounded-4"
           @click="login"
         >
           Login
@@ -63,7 +58,7 @@
         <button
           type="submit"
           id="btn-haveaccount"
-          class="btn fs-5 mt-4 mb-2"
+          class="btn fs-5 mt-4 mb-2 me-1"
           @click="tosignuppage"
         >
           I need to create account
@@ -72,22 +67,22 @@
 
       <div class="mt-5 ms-3">
         <div id="footer-div">
-          <div id="footer-p" class="ms-5 fs-5 pt-4">
-            <p class="text-capitalize">Follow us in our social media</p>
-          </div>
-          <div id="footer-icn" class="ms-5 pt-3">
+          <div id="footer-p" class="ms-2 fs-5 pt-4 d-flex flex-nowrap ">
+            <p class="text-capitalize ">Follow us in our social media</p>
+          </div >
+          <div id="footer-icn" class="ms-5 pt-3 d-flex justify-content-center flex-nowrap">
             <font-awesome-icon
               class="icon-brand fs-3 rounded-circle p-1"
               icon="fa-brands fa-instagram"
               @click="social('instagram')"
             />
             <font-awesome-icon
-              class="icon-brand fs-3 rounded-circle p-1 ms-3"
+              class="icon-brand fs-3 rounded-circle p-1 ms-2"
               icon="fa-brands fa-telegram"
               @click="social('telegram')"
             />
             <font-awesome-icon
-              class="icon-brand fs-3 rounded-circle p-1 ms-3"
+              class="icon-brand fs-3 rounded-circle p-1 ms-2"
               icon="fa-brands fa-github"
               @click="social('github')"
             />
@@ -103,20 +98,25 @@
 
 <script>
 import Swal from "sweetalert2";
-import regfuncs from './reg.vue'
+import regfuncs from "./reg.vue";
 import axios from "axios";
-import {info} from "../../config/default";
+import { info } from "../../config/default";
+let jwt = regfuncs.methods.getcookies("jwt");
 export default {
   name: "login",
+  beforeMount() {
+    if (jwt) {
+      regfuncs.methods.removecookies(7, jwt);
+    }
+  },
   data() {
     return {
       eyeicon: "fa-solid fa-eye-slash",
 
       passicn: "fa-solid fa-check-circle",
-      
+
       usernameicn: "fa-solid fa-check-circle",
 
-     
       passawesome: "icons-check",
       userawesome: "icons-check",
     };
@@ -182,43 +182,37 @@ export default {
         return true;
       }
     },
-    login:function(){
+    login: function () {
       const passwordvalidate = this.passwordchecker();
       const usernamevalidate = this.usernamechecker();
       let apiaddress = info.fetch["address"];
-      if(passwordvalidate && usernamevalidate){
+      if (passwordvalidate && usernamevalidate) {
         axios
           .post(`${apiaddress}login`, {
             username: this.$refs.usernameinput.value.toLowerCase(),
-            password:this.$refs.passwordinput.value
-      }).then(data=>{
-        
-       if(data.data.code == 200){
-        this.$refs.passwordalert.innerHTML= ""
-        regfuncs.methods.setcookies(7,data.data.token)
-        Swal.fire({
+            password: this.$refs.passwordinput.value,
+          })
+          .then((data) => {
+            if (data.data.code == 200) {
+              this.$refs.passwordalert.innerHTML = "";
+              regfuncs.methods.setcookies(7, data.data.token);
+              Swal.fire({
                 icon: "success",
                 title: "Welcome back",
                 showConfirmButton: false,
                 timer: 1500,
               });
-              setInterval(()=> {
-                location.href='#/home'
+              setInterval(() => {
+                location.href = "#/home";
               }, 1600);
-      
-       }else{
-        
-        this.$refs.passwordalert.innerHTML= data.data.message
-       }
-      })
-
+            } else {
+              this.$refs.passwordalert.innerHTML = data.data.message;
+            }
+          });
       }
     },
-
-    
   },
 };
- 
 </script>
 
 <style scoped>
@@ -276,7 +270,7 @@ label {
 }
 #btn-haveaccount {
   margin-left: 20%;
-  border-bottom:  2px solid var(--blue);
+  border-bottom: 2px solid var(--blue);
   border-radius: 0;
 }
 #footer-div {
@@ -294,11 +288,8 @@ label {
   cursor: pointer;
 }
 #img-reg-div {
- 
-  
-position: relative;
+  position: relative;
   left: -80px;
-
 }
 #img {
   scale: 1.2;
@@ -318,5 +309,38 @@ position: relative;
   margin-top: 5px;
   font-family: "Lora";
   color: #e60a0a;
+}
+@media screen and (max-width: 1080px) {
+  #img-reg-div {
+    display: none;
+  }
+  .icon-brand{
+  scale: 0.9;
+  margin: 0; 
+}
+}
+@media screen and (max-width: 768px) {
+ 
+    #btn-haveaccount {
+      margin-left: 7%;
+      
+      
+      
+    
+  }
+  input[type="text"],
+input[type="password"] {
+
+  width: 95%;
+}
+.icon-brand{
+  scale: 0.8;
+  margin: 0; 
+}
+#footer-p p{
+  
+  text-align: center;
+  
+}
 }
 </style>

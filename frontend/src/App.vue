@@ -12,17 +12,9 @@ export default {
     if (regfunc.methods.getcookies("jwt")) {
       let jwt = regfunc.methods.getcookies("jwt");
       let apiaddress = info.fetch["address"];
-      console.log(jwt);
+
       axios.get(`${apiaddress}jwt/${jwt}`).then((res) => {
-        if (res.data.status == "ok") {
-          if (
-            location.href == `${info.server}#/home` ||
-            location.href == `${info.server}` ||
-            location.href == `${info.server}#/`
-          ) {
-            return (location.href = `${info.server}#/home`);
-          }
-        } else {
+        if (res.data.status !== "ok") {
           regfunc.methods.removecookies(7, jwt);
           location.href = "#/login";
         }

@@ -3,7 +3,7 @@
     <pheader @change="change" />
     <div v-if="!loader" class="my-4">
       <div v-if="loc == 'exams'" class="d-flex justify-content-center">
-        <table class="table ">
+        <table class="table w-75 ">
           <thead>
             <tr>
               <th class="text-capitalize text-center w-50">name</th>

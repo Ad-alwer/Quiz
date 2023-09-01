@@ -30,19 +30,21 @@
         placeholder="Time (Min)"
       />
     </div>
-   
+
     <div class="mt-4">
       <p class="text-secondary fs-5 fw-bold">Questions</p>
-      <button
-        @click.prevent="addquestion"
-        class="form-control fs-5 btngreen border ms-4 border-2"
-      >
-        +
-      </button>
-      <div v-for="y in quesions" :key="y" class="mt-2">
+      <div class="d-flex justify-content-center">
+        <button
+          @click.prevent="addquestion"
+          class="w-100 btn fs-5 btngreen border border-2"
+        >
+          +
+        </button>
+      </div>
+      <div v-for="y in quesions" :key="y" class="mt-2 justify-content-center d-flex flex-column">
         <input
           type="text"
-          class="form-control fs-5 border ms-4 border-2 text-capitalize text-center btn"
+          class="mx-5 fs-5 border  border-2 text-capitalize text-center btn"
           readonly
           :value="y.Question"
           @click="deletequestion(y.Question)"
@@ -56,7 +58,9 @@
       >
         Next
       </button>
-      <button class="btn btn-secondary px-3 py-2"  @click.prevent="back">Back</button>
+      <button class="btn btn-secondary px-3 py-2" @click.prevent="back">
+        Back
+      </button>
     </div>
   </form>
   <popup v-if="popupshow" @closepopup="closepop" @save="savequestion($event)" />
@@ -78,6 +82,7 @@ import regfuncs from "./reg.vue";
 import share from "./create/share.vue";
 let apiaddress = info.fetch["address"];
 
+let jwt = regfuncs.methods.getcookies("jwt");
 const Toast = Swal.mixin({
   toast: true,
   position: "top-end",
@@ -92,6 +97,18 @@ const Toast = Swal.mixin({
 
 export default {
   name: "create",
+  beforeMount() {
+    if (jwt) {
+     axios.get(`${apiaddress}jwt/${jwt}`).then(res => {
+     if(res.data.status !== 'ok'){
+      location.href="#/login"
+     }
+     })
+    }else{
+      location.href="#/login"
+    }
+  },
+ 
   data() {
     return {
       field: ["name"],
@@ -177,16 +194,15 @@ export default {
           .then((res) => {
             if (res.data.status == "ok") {
               let quizid = res.data.data._id;
-              this.examcreater=res.data.data.autor.username
-              this.examname=res.data.data.name
+              this.examcreater = res.data.data.autor.username;
+              this.examname = res.data.data.name;
               this.url = `${info.server}/#/exam/${quizid}`;
               this.shareshow = true;
-            }
-            else{
+            } else {
               Toast.fire({
-          icon: "info",
-          title: `Try again later`,
-        });
+                icon: "info",
+                title: `Try again later`,
+              });
             }
           });
       } else {
@@ -196,9 +212,9 @@ export default {
         });
       }
     },
-    back:function(){
-      location.href="#/home"
-    }
+    back: function () {
+      location.href = "#/home";
+    },
   },
   components: {
     popup,
@@ -220,8 +236,9 @@ export default {
   background-color: rgb(8, 204, 8);
 }
 #nameawesome {
-  position: relative;
-  left: -25px;
+  margin-left: -25px;
+  /* position: relative; */
+  /* left: -25px; */
 }
 .blur {
   filter: blur(5px);

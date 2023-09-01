@@ -60,11 +60,11 @@
         </form>
       </div>
 
-      <div>
+      <div class="d-flex justify-content-center flex-nowrap ">
         <button
           type="submit "
           id="btn-signup"
-          class="text-uppercase btn signup fs-4 mt-4 px-4 py-2 ms-5 rounded-4"
+          class="text-uppercase btn signup fs-4 mt-4 px-4 py-2  rounded-4"
           @click="signup"
         >
           Sign up
@@ -81,22 +81,22 @@
 
       <div class="mt-5 ms-3">
         <div id="footer-div">
-          <div id="footer-p" class="ms-5 fs-5 pt-4">
+          <div id="footer-p" class="ms-3 fs-5 pt-4 justify-content-center flex-nowrap">
             <p class="text-capitalize">Follow us in our social media</p>
           </div>
-          <div id="footer-icn" class="ms-5 pt-3">
+          <div id="footer-icn" class="ms-4 pt-3 d-flex justify-content-center flex-nowrap">
             <font-awesome-icon
               class="icon-brand fs-3 rounded-circle p-1"
               icon="fa-brands fa-instagram"
               @click="social('instagram')"
             />
             <font-awesome-icon
-              class="icon-brand fs-3 rounded-circle p-1 ms-3"
+              class="icon-brand fs-3 rounded-circle p-1 ms-2"
               icon="fa-brands fa-telegram"
               @click="social('telegram')"
             />
             <font-awesome-icon
-              class="icon-brand fs-3 rounded-circle p-1 ms-3"
+              class="icon-brand fs-3 rounded-circle p-1 ms-2"
               icon="fa-brands fa-github"
               @click="social('github')"
             />
@@ -114,9 +114,16 @@
 import Swal from "sweetalert2";
 import axios from "axios";
 import {info} from "../../config/default";
+
 let apiaddress = info.fetch["address"];
+// let jwt = this.getcookies("jwt");
 export default {
   name: "Reg",
+  beforeMount() {
+    if (this.getcookies("jwt")) {
+      this.removecookies(7,this.getcookies("jwt"))
+    }
+  },
   data() {
     return {
       eyeicon: "fa-solid fa-eye-slash",
@@ -360,5 +367,41 @@ label {
 }
 .signup,.signup:hover{
   background-color: var(--blue);
+}
+@media screen and (max-width: 1080px) {
+  #img-reg-div {
+    display: none;
+  }
+  .icon-brand{
+  scale: 0.9;
+  margin: 0; 
+}
+}
+@media screen and (max-width: 768px) {
+ 
+    #btn-haveaccount {
+      margin-left: 7%;
+      
+      
+      
+    
+  }
+  input[type="text"],
+input[type="password"] {
+
+  width: 95%;
+}
+.icon-brand{
+  scale: 0.8;
+  margin: 0; 
+}
+#footer-p p{
+  
+  text-align: center;
+  
+}
+#btn-haveaccount{
+  scale: 0.9;
+}
 }
 </style>
