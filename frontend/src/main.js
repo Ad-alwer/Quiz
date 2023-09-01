@@ -14,7 +14,6 @@ import exam from "./components/exam.vue";
 import notfound from "./components/404.vue";
 import pshow from "./components/Profile/shower";
 import profile from "./components/profile.vue";
-
 import report from "./components/Profile/showresault.vue";
 
 const routes = [
@@ -29,8 +28,7 @@ const routes = [
   { path: "/profile/exams", component: pshow },
   { path: "/profile/created", component: pshow },
   { path: "/report/:id", component: report },
-  { path: "/:pathMatch(.*)", component: notfound }
-
+  { path: "/:pathMatch(.*)", component: notfound },
 ];
 
 const router = createRouter({
